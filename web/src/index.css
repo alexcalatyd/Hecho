@@ -114,7 +114,7 @@ button:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, v
   border-radius: 22px; display: flex; flex-direction: column; min-height: 0;
   padding-top: calc(env(safe-area-inset-top) + 14px);
 }
-html.native .sidebar { padding-top: 40px; }
+html.native .sidebar { padding-top: 44px; }
 .sidebar-top { display: flex; justify-content: center; padding: 0 12px 14px; }
 .sidebar-top .segmented { width: 100%; }
 .sidebar-top .segmented button { flex: 1; justify-content: center; padding: 0 8px; }

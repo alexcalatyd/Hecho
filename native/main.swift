@@ -35,6 +35,7 @@ final class Bridge: NSObject, WKScriptMessageHandler {
             case "dark": NSApp.appearance = NSAppearance(named: .darkAqua)
             default: NSApp.appearance = nil
             }
+            (NSApp.delegate as? AppDelegate)?.placeLights()
         }
     }
 }
@@ -81,6 +82,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+
+        // AppKit recoloca los semáforos cuando le apetece: los devolvemos a su sitio
+        placeLights()
+        let nc = NotificationCenter.default
+        for name in [NSWindow.didResizeNotification, NSWindow.didBecomeKeyNotification,
+                     NSWindow.didResignKeyNotification, NSWindow.didChangeScreenNotification] {
+            nc.addObserver(forName: name, object: window, queue: .main) { [weak self] _ in self?.placeLights() }
+        }
+        if let bar = window.standardWindowButton(.closeButton)?.superview {
+            bar.postsFrameChangedNotifications = true
+            nc.addObserver(forName: NSView.frameDidChangeNotification, object: bar, queue: .main) { [weak self] _ in
+                DispatchQueue.main.async { self?.placeLights() }
+            }
+        }
+    }
+
+    /// Semáforos dentro de la barra lateral flotante (que empieza a 12 pt del borde), con su margen
+    private let lightsInset: CGFloat = 12 + 14
+    private let titlebarHeight: CGFloat = 44
+    private var lightsStep: CGFloat?
+
+    func placeLights() {
+        guard let close = window.standardWindowButton(.closeButton),
+              let bar = close.superview, let container = bar.superview else { return }
+        let types: [NSWindow.ButtonType] = [.closeButton, .miniaturizeButton, .zoomButton]
+        let buttons = types.compactMap { window.standardWindowButton($0) }
+        if lightsStep == nil, buttons.count > 1 { lightsStep = buttons[1].frame.minX - buttons[0].frame.minX }
+        let step = lightsStep ?? 20
+
+        let frame = NSRect(x: 0, y: window.frame.height - titlebarHeight, width: window.frame.width, height: titlebarHeight)
+        if container.frame != frame { container.frame = frame }
+        if bar.frame != container.bounds { bar.frame = container.bounds }
+        for (i, b) in buttons.enumerated() {
+            let o = NSPoint(x: lightsInset + CGFloat(i) * step, y: bar.bounds.height - lightsInset - b.frame.height)
+            if b.frame.origin != o { b.setFrameOrigin(o) }
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ s: NSApplication) -> Bool { true }
