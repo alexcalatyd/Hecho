@@ -627,3 +627,22 @@ html.native .mobile { padding-top: 44px; }
 @media (hover: none) and (pointer: coarse) {
   input { font-size: 16px !important; }
 }
+
+/* ---------- Estado de la tarea ---------- */
+.status {
+  display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px 0 6px; border-radius: 999px;
+  font-size: 12px; font-weight: 500; white-space: nowrap; color: var(--label-3);
+  transition: background 0.2s, color 0.2s, opacity 0.2s, transform 0.15s var(--ease);
+}
+.status svg { flex: none; }
+.status:active { transform: scale(0.94); }
+.status.doing { color: var(--accent); background: var(--accent-soft); }
+.status.todo:hover { background: var(--fill); color: var(--label-2); }
+/* «sin empezar» es lo normal: solo se deja ver al pasar por encima */
+.status.todo { opacity: 0; }
+.item:hover .status.todo, .status.todo:focus-visible { opacity: 1; }
+@media (hover: none) {
+  .status.todo { opacity: 1; padding: 0 6px; }
+  .status.todo span { display: none; }
+}
+.item-wrap.selecting .status { display: none; }

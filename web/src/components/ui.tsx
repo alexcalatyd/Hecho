@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { Check, Plus, ArrowUp, X, ChevronRight, MoreHorizontal } from 'lucide-react'
 import { useDraggable } from '@dnd-kit/core'
-import type { Member, Priority, Todo } from '../lib/store'
+import type { Member, Priority, Todo, TodoStatus } from '../lib/store'
 import { useSelection } from '../lib/selection'
 import { useT } from '../lib/i18n'
 
@@ -116,6 +116,36 @@ export function PriorityButton({
   )
 }
 
+/* ---------- Estado: sin empezar / en progreso ---------- */
+export function StatusButton({ value, onChange }: { value: TodoStatus; onChange: (s: TodoStatus) => void }) {
+  const t = useT()
+  const doing = value === 'doing'
+  const label = t(doing ? 'statusDoing' : 'statusTodo')
+  return (
+    <button
+      type="button"
+      className={`status ${doing ? 'doing' : 'todo'}`}
+      onClick={() => onChange(doing ? 'todo' : 'doing')}
+      title={`${label} · ${t('clickToChange')}`}
+      aria-label={label}
+      aria-pressed={doing}
+    >
+      <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
+        <circle cx="6" cy="6" r="4.75" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray={doing ? undefined : '2.2 1.6'} />
+        <motion.path
+          d="M6 2.5 A3.5 3.5 0 0 1 6 9.5 Z"
+          fill="currentColor"
+          initial={false}
+          animate={{ opacity: doing ? 1 : 0, scale: doing ? 1 : 0.5 }}
+          style={{ originX: '6px', originY: '6px' }}
+          transition={spring}
+        />
+      </svg>
+      <span>{label}</span>
+    </button>
+  )
+}
+
 /* ---------- Campo para añadir ---------- */
 export function Composer({
   onAdd,
@@ -206,6 +236,7 @@ export function TodoItem({
   onRename,
   onRemove,
   onPriority,
+  onStatus,
 }: {
   todo: Todo
   author?: Member
@@ -213,6 +244,7 @@ export function TodoItem({
   onRename: (t: string) => void
   onRemove: () => void
   onPriority: (p: Priority) => void
+  onStatus: (s: TodoStatus) => void
 }) {
   const t = useT()
   const [editing, setEditing] = useState(false)
@@ -272,6 +304,7 @@ export function TodoItem({
           </span>
         )}
         <span className="meta">
+          {!todo.done && <StatusButton value={todo.status ?? 'todo'} onChange={onStatus} />}
           {!todo.done && <PriorityButton value={todo.priority} onChange={onPriority} quiet />}
           {author && <Avatar m={author} size="sm" />}
           <button className="del" onClick={onRemove} aria-label={t('delete')}>

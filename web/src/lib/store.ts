@@ -17,12 +17,17 @@ export interface Node {
   collapsed?: boolean
 }
 
+/** Estado de una tarea pendiente; las completadas no tienen estado */
+export type TodoStatus = 'todo' | 'doing'
+
 export interface Todo {
   id: string
   listId: string
   text: string
   done: boolean
   priority: Priority
+  /** sin empezar o en progreso (datos antiguos pueden no tenerlo) */
+  status?: TodoStatus
   createdAt: number
   doneAt?: number
   author: string
@@ -117,6 +122,7 @@ type TodoRow = {
   text: string
   done: boolean
   priority: number
+  status: TodoStatus
   created_at: number
   done_at: number | null
   author: string | null
@@ -146,6 +152,7 @@ const todoToRow = (t: Todo, space_id: string): TodoRow => ({
   text: t.text,
   done: t.done,
   priority: t.priority,
+  status: t.done ? 'todo' : (t.status ?? 'todo'),
   created_at: t.createdAt,
   done_at: t.doneAt ?? null,
   author: t.author,
@@ -156,6 +163,7 @@ const rowToTodo = (r: TodoRow): Todo => ({
   text: r.text,
   done: r.done,
   priority: r.priority as Priority,
+  status: r.status === 'doing' && !r.done ? 'doing' : 'todo',
   createdAt: Number(r.created_at),
   doneAt: r.done_at == null ? undefined : Number(r.done_at),
   author: r.author ?? '',
@@ -394,7 +402,10 @@ export function useSpace(space: SpaceId, cloudId: string | null, me: string) {
         ...d,
         todos: [{ id: uid(), listId, text, done: false, priority, createdAt: Date.now(), author: me }, ...d.todos],
       })),
-    toggleTodo: (id: string) => mapTodo(id, (t) => ({ ...t, done: !t.done, doneAt: t.done ? undefined : Date.now() })),
+    // al tacharla pierde el estado; si se destacha vuelve a «sin empezar»
+    toggleTodo: (id: string) =>
+      mapTodo(id, (t) => ({ ...t, done: !t.done, doneAt: t.done ? undefined : Date.now(), status: 'todo' })),
+    setStatus: (id: string, status: TodoStatus) => mapTodo(id, (t) => (t.done ? t : { ...t, status })),
     renameTodo: (id: string, text: string) => mapTodo(id, (t) => ({ ...t, text })),
     setPriority: (id: string, priority: Priority) => mapTodo(id, (t) => ({ ...t, priority })),
     removeTodos: (ids: string[]) => {

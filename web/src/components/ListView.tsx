@@ -60,6 +60,7 @@ export function ListView({
       onRename={(txt) => space.renameTodo(t.id, txt)}
       onRemove={() => space.removeTodos([t.id])}
       onPriority={(p) => space.setPriority(t.id, p)}
+      onStatus={(st) => space.setStatus(t.id, st)}
     />
   )
 
