@@ -3,7 +3,9 @@ import { supabase } from './supabase'
 import { tr } from './i18n'
 
 export type SpaceId = 'personal' | 'shared'
-export type Priority = 0 | 1 | 2 | 3 // ninguna, baja, media, alta
+export type Priority = 1 | 2 | 3 // baja, media, alta (siempre hay una)
+/** Normaliza valores antiguos (0 = sin prioridad) a baja */
+export const toPriority = (n: unknown): Priority => Math.min(3, Math.max(1, Number(n) || 1)) as Priority
 
 /** Un nodo del árbol: grupo (carpeta, se puede anidar) o lista (contiene tareas). */
 export interface Node {
@@ -162,7 +164,7 @@ const rowToTodo = (r: TodoRow): Todo => ({
   listId: r.list_id,
   text: r.text,
   done: r.done,
-  priority: r.priority as Priority,
+  priority: toPriority(r.priority),
   status: r.status === 'doing' && !r.done ? 'doing' : 'todo',
   createdAt: Number(r.created_at),
   doneAt: r.done_at == null ? undefined : Number(r.done_at),
@@ -188,7 +190,7 @@ function remap(d: SpaceData, me: string): SpaceData {
       ...t,
       id: uid(),
       listId: id(t.listId),
-      priority: (t.priority ?? 0) as Priority,
+      priority: toPriority(t.priority),
       author: me,
     })),
   }

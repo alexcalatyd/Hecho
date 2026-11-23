@@ -334,8 +334,6 @@ html.native .mobile { padding-top: 44px; }
 .prio.p1 { color: var(--label-2); }
 .prio.p2 { color: #ff9f0a; }
 .prio.p3 { color: #ff453a; }
-.prio.quiet.p0 { opacity: 0; transition: opacity 0.2s, background 0.2s; }
-.item:hover .prio.quiet.p0, .prio.quiet.p0:focus-visible { opacity: 1; }
 
 /* ---------- Árbol ---------- */
 .tree { display: flex; flex-direction: column; }

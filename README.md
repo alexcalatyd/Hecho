@@ -92,7 +92,7 @@ Double-click any name to rename it. Every group shows how many tasks are
 pending inside it.
 
 To set a priority, click the bars next to the field (or on any task) until
-it's the one you want, or start a task with `!`, `!!` or `!!!`:
+it's the one you want (new tasks start at low), or start a task with `!`, `!!` or `!!!`:
 
 ```
 !!! Call the plumber back

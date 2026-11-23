@@ -82,8 +82,8 @@ export function Avatar({ m, size }: { m: Member; size?: 'sm' }) {
 }
 
 /* ---------- Prioridad: tres barritas ---------- */
-const PRIORITY_KEY = ['p0', 'p1', 'p2', 'p3'] as const
-const nextPriority = (p: Priority) => ((p + 1) % 4) as Priority
+const PRIORITY_KEY = { 1: 'p1', 2: 'p2', 3: 'p3' } as const
+const nextPriority = (p: Priority) => ((p % 3) + 1) as Priority
 
 export function PriorityButton({
   value,
@@ -158,7 +158,7 @@ export function Composer({
 }) {
   const t = useT()
   const [v, setV] = useState('')
-  const [p, setP] = useState<Priority>(0)
+  const [p, setP] = useState<Priority>(1)
   const ref = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -181,10 +181,10 @@ export function Composer({
     if (!text) return
     onAdd(text, m ? (m[1].length as Priority) : p)
     setV('')
-    setP(0)
+    setP(1)
   }
 
-  const active = !!v.trim() || p > 0
+  const active = !!v.trim() || p > 1
 
   return (
     <form
@@ -200,9 +200,9 @@ export function Composer({
         value={v}
         onChange={(e) => setV(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === 'Escape') (setV(''), setP(0), ref.current?.blur())
+          if (e.key === 'Escape') (setV(''), setP(1), ref.current?.blur())
           if (e.metaKey && e.key === 'ArrowUp') (e.preventDefault(), setP((x) => Math.min(3, x + 1) as Priority))
-          if (e.metaKey && e.key === 'ArrowDown') (e.preventDefault(), setP((x) => Math.max(0, x - 1) as Priority))
+          if (e.metaKey && e.key === 'ArrowDown') (e.preventDefault(), setP((x) => Math.max(1, x - 1) as Priority))
         }}
         placeholder={placeholder}
         enterKeyHint="done"
