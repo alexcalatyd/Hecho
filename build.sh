@@ -34,8 +34,10 @@ echo "✓ $APP"
 
 if [ "$1" = "--install" ]; then
   pkill -x Hecho 2>/dev/null || true
+  # espera a que la versión anterior se cierre del todo antes de abrir la nueva
+  for _ in {1..50}; do pgrep -x Hecho >/dev/null || break; sleep 0.1; done
   rm -rf /Applications/Hecho.app
   cp -R "$APP" /Applications/
-  open /Applications/Hecho.app
+  open /Applications/Hecho.app || { sleep 1; open /Applications/Hecho.app; }
   echo "✓ installed in /Applications"
 fi
