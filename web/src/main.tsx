@@ -5,6 +5,7 @@ import App, { type Cloud } from './App.tsx'
 import { Login } from './components/Login.tsx'
 import { supabase, useSession } from './lib/supabase'
 import { useT } from './lib/i18n'
+import './lib/theme'
 
 const native = (window as any).webkit?.messageHandlers?.native
 if (native) document.documentElement.classList.add('native')

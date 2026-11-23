@@ -20,6 +20,7 @@
   --ring: #f2f2f7;
   --solid: #ffffff;
   --solid-shadow: 0 0 0 0.5px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.08), 0 16px 40px rgba(0,0,0,.12);
+  --pop-shadow: 0 0 0 0.5px rgba(0,0,0,.1), 0 6px 16px rgba(0,0,0,.12), 0 24px 60px rgba(0,0,0,.22);
 
   --ease: cubic-bezier(0.32, 0.72, 0, 1);
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
@@ -28,7 +29,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #232326;
     --glass: rgba(44, 44, 48, 0.5);
     --glass-strong: rgba(54, 54, 58, 0.72);
@@ -46,8 +47,31 @@
     --ring: #2c2c30;
     --solid: #2c2c2f;
     --solid-shadow: 0 0 0 0.5px rgba(255,255,255,.1), 0 4px 12px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.45);
+    --pop-shadow: 0 0 0 0.5px rgba(255,255,255,.12), 0 6px 16px rgba(0,0,0,.4), 0 24px 60px rgba(0,0,0,.6);
   }
 }
+:root[data-theme='dark'] {
+  --bg: #232326;
+  --glass: rgba(44, 44, 48, 0.5);
+  --glass-strong: rgba(54, 54, 58, 0.72);
+  --glass-edge: rgba(255, 255, 255, 0.12);
+  --fill: rgba(118, 118, 128, 0.2);
+  --fill-2: rgba(118, 118, 128, 0.32);
+  --label: rgba(255, 255, 255, 0.92);
+  --label-2: rgba(235, 235, 245, 0.6);
+  --label-3: rgba(235, 235, 245, 0.28);
+  --separator: rgba(255, 255, 255, 0.09);
+  --shadow:
+    0 0 0 0.5px rgba(255, 255, 255, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 16px 40px rgba(0, 0, 0, 0.35);
+  --ring: #2c2c30;
+  --solid: #2c2c2f;
+  --solid-shadow: 0 0 0 0.5px rgba(255,255,255,.1), 0 4px 12px rgba(0,0,0,.3), 0 16px 40px rgba(0,0,0,.45);
+  --pop-shadow: 0 0 0 0.5px rgba(255,255,255,.12), 0 6px 16px rgba(0,0,0,.4), 0 24px 60px rgba(0,0,0,.6);
+}
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark'] { color-scheme: dark; }
 
 * { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -275,6 +299,7 @@ html.native .mobile { padding-top: 44px; }
   width: 280px; padding: 16px; border-radius: 18px;
   background: var(--solid);
 }
+.popover.solid { box-shadow: var(--pop-shadow); }
 .popover h4 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
 .popover p { font-size: 13px; color: var(--label-2); margin: 4px 0 12px; }
 .popover .row-form { display: flex; gap: 8px; }
@@ -504,7 +529,7 @@ html.native .mobile { padding-top: 44px; }
 
 /* ---------- Cuenta ---------- */
 .sidebar-foot { padding: 8px 12px 12px; border-top: 0.5px solid var(--separator); display: flex; align-items: center; justify-content: space-between; }
-.topbar { position: relative; }
+.topbar { position: relative; z-index: 30; }
 .topbar-account { position: absolute; right: 0; top: 50%; translate: 0 -50%; }
 .account-btn { border-radius: 50%; display: grid; transition: transform 0.15s var(--ease); }
 .account-btn:active { transform: scale(0.94); }
@@ -560,9 +585,10 @@ html.native .mobile { padding-top: 44px; }
 .settings-pop.up { top: auto; bottom: calc(100% + 10px); right: 0; transform-origin: bottom right; }
 .settings-pop.down { left: 0; right: auto; transform-origin: top left; }
 .settings-label { font-size: 12px !important; font-weight: 500; color: var(--label-2) !important; margin: 0 0 8px !important; }
+.settings-label + .lang-switch + .settings-label { margin-top: 12px !important; }
 .lang-switch { display: flex; padding: 2px; border-radius: 9px; background: var(--fill); }
 .lang-switch button {
-  position: relative; z-index: 1; flex: 1; height: 28px; border-radius: 7px;
+  position: relative; z-index: 1; flex: 1; height: 28px; border-radius: 7px; padding: 0 4px;
   font-size: 13px; color: var(--label-2); transition: color .2s var(--ease);
 }
 .lang-switch button[aria-checked='true'] { color: var(--label); }

@@ -85,6 +85,10 @@ const es = {
   signOut: 'Cerrar sesión',
   settings: 'Ajustes',
   language: 'Idioma',
+  theme: 'Tema',
+  themeSystem: 'Sistema',
+  themeLight: 'Claro',
+  themeDark: 'Oscuro',
 
   // login
   tagline: 'Tus tareas, en el Mac y en el móvil.',
@@ -186,6 +190,10 @@ const en: Record<Key, string> = {
   signOut: 'Sign out',
   settings: 'Settings',
   language: 'Language',
+  theme: 'Theme',
+  themeSystem: 'System',
+  themeLight: 'Light',
+  themeDark: 'Dark',
 
   tagline: 'Your tasks, on your Mac and your phone.',
   taglineSignup: 'Create your account to have your tasks everywhere.',
