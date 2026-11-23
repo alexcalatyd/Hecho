@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Copy, Check, ChevronRight } from 'lucide-react'
+import { Copy, Check, ChevronRight, UserPlus } from 'lucide-react'
 import { prettyCode, type useMembers } from '../lib/members'
 import { supabase } from '../lib/supabase'
 import { Avatar, ease } from './ui'
@@ -33,8 +33,55 @@ export function Members({ team }: { team: Team }) {
   )
 }
 
+/** Escritorio: avatares que abren el panel de compartir en un popover */
+export function ShareButton({ team, me }: { team: Team; me: string }) {
+  const t = useT()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const close = (e: PointerEvent) => !ref.current?.contains(e.target as Node) && setOpen(false)
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('pointerdown', close)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('pointerdown', close)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [open])
+
+  return (
+    <div className="pop-wrap" ref={ref}>
+      <button className="avatars share-trigger" data-open={open} onClick={() => setOpen((o) => !o)} aria-label={t('share')} title={t('share')}>
+        {team.members.map((m) => (
+          <Avatar key={m.id} m={m} />
+        ))}
+        {team.members.length <= 1 && (
+          <span className="avatar add">
+            <UserPlus size={13} strokeWidth={2.4} />
+          </span>
+        )}
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="popover solid share-pop"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1, transition: { duration: 0.18, ease } }}
+            exit={{ opacity: 0, transition: { duration: 0.1 } }}
+            style={{ transformOrigin: 'top right' }}
+          >
+            <SharePanel team={team} me={me} bare />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 /** Panel de compartir: siempre visible en el espacio compartido, con el código listo para copiar */
-export function SharePanel({ team, me }: { team: Team; me: string }) {
+export function SharePanel({ team, me, bare }: { team: Team; me: string; bare?: boolean }) {
   const t = useT()
   const [copied, setCopied] = useState(false)
   const [joining, setJoining] = useState(false)
@@ -69,13 +116,13 @@ export function SharePanel({ team, me }: { team: Team; me: string }) {
   const others = team.members.filter((m) => m.id !== me)
 
   return (
-    <section className="share-panel glass">
+    <section className={`share-panel ${bare ? 'bare' : 'glass'}`}>
       <div className="share-head">
         <div>
           <h4>{alone ? t('inviteSomeone') : t('sharedWith', { names: others.map((m) => m.name).join(', ') })}</h4>
           <p>{t('shareText')}</p>
         </div>
-        {!alone && <Members team={team} />}
+        {!alone && !bare && <Members team={team} />}
       </div>
 
       <div className="code-box">

@@ -133,6 +133,7 @@ export default function App({ userId, cloud }: { userId: string; cloud: Cloud | 
           spaceId={spaceId}
           listId={sel}
           team={team}
+          sharePopover={wide && !!cloud}
           onCreateList={() => select(space.addNode('list', null, t('newList')).id)}
         />
       </motion.div>
@@ -147,7 +148,6 @@ export default function App({ userId, cloud }: { userId: string; cloud: Cloud | 
           <aside className="sidebar glass">
             <div className="sidebar-top">{segmented}</div>
             <div className="sidebar-scroll">{tree}</div>
-            {share}
             <div className="sidebar-foot">
               {cloud && <Account userId={userId} align="up" />}
               <Settings align="up" />

@@ -3,7 +3,7 @@ import { AnimatePresence } from 'motion/react'
 import { Sparkle, HeartHandshake, ListPlus } from 'lucide-react'
 import { pathOf, type Space, type SpaceId } from '../lib/store'
 import { AutoHeight, Composer, Empty, InlineName, SectionToggle, TodoItem } from './ui'
-import { Members, type Team } from './Members'
+import { Members, ShareButton, type Team } from './Members'
 import { useSelection } from '../lib/selection'
 import { useT } from '../lib/i18n'
 
@@ -13,12 +13,15 @@ export function ListView({
   listId,
   onCreateList,
   team,
+  sharePopover = false,
 }: {
   space: Space
   spaceId: SpaceId
   listId: string | null
   onCreateList: () => void
   team: Team
+  /** escritorio: los avatares abren el código de invitación */
+  sharePopover?: boolean
 }) {
   const [showDone, setShowDone] = useState(true)
   const [renaming, setRenaming] = useState(false)
@@ -86,7 +89,7 @@ export function ListView({
               {sel.mode ? t('done') : t('select')}
             </button>
           )}
-          {isShared && team.members.length > 1 && <Members team={team} />}
+          {isShared && (sharePopover ? <ShareButton team={team} me={space.me} /> : team.members.length > 1 && <Members team={team} />)}
         </div>
       </header>
 

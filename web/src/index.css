@@ -646,3 +646,9 @@ html.native .mobile { padding-top: 44px; }
   .status.todo span { display: none; }
 }
 .item-wrap.selecting .status { display: none; }
+
+/* escritorio: el panel de compartir vive dentro del popover de los avatares */
+.share-trigger { padding: 2px; border-radius: 999px; transition: transform 0.15s var(--ease); }
+.share-trigger:active { transform: scale(0.96); }
+.share-trigger:hover .avatar.add, .share-trigger[data-open='true'] .avatar.add { background: var(--fill-2); color: var(--label); }
+.share-panel.bare { padding: 0; margin: 0; border-radius: 0; background: none; }
