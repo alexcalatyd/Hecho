@@ -1,0 +1,12 @@
+# compilados
+build/
+web/dist/
+
+# secretos y estado local
+.env.local
+*.local
+supabase/.temp/
+supabase/.env*
+
+node_modules/
+.DS_Store
