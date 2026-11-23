@@ -657,3 +657,40 @@ html.native .mobile { padding-top: 44px; }
 /* en móvil el popover no cabe a lo ancho: se ajusta a la pantalla */
 @media (max-width: 759px) { .share-pop { width: min(300px, calc(100vw - 32px)); } }
 .header { position: relative; z-index: 20; }
+
+/* ---------- Varias compartidas: flechita junto a los avatares ---------- */
+.share-group { display: flex; align-items: center; gap: 2px; }
+.spaces-trigger {
+  display: inline-flex; align-items: center; gap: 3px; height: 28px; min-width: 24px; padding: 0 5px; border-radius: 999px;
+  color: var(--label-2); transition: background 0.15s, color 0.15s, transform 0.15s var(--ease);
+}
+.spaces-trigger svg { transition: transform 0.2s var(--ease); }
+.spaces-trigger:hover, .spaces-trigger[data-open='true'] { background: var(--fill); color: var(--label); }
+.spaces-trigger[data-open='true'] svg { transform: rotate(180deg); }
+.spaces-trigger:active { transform: scale(0.94); }
+.spaces-count { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.spaces-pop { width: 300px; padding: 14px; }
+.spaces h4 { padding: 0 4px; }
+.spaces > p { padding: 0 4px; margin: 2px 0 10px !important; }
+.spaces-list { display: flex; flex-direction: column; gap: 2px; max-height: 320px; overflow-y: auto; }
+.space-row {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px; border-radius: 12px; text-align: left;
+  transition: background 0.15s;
+}
+.space-row:hover { background: var(--fill); }
+.space-row[data-current='true'] { background: var(--accent-soft); }
+.space-row .avatars { flex: none; }
+.space-row .avatar { width: 26px; height: 26px; font-size: 11px; box-shadow: 0 0 0 2px var(--solid); }
+.space-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.space-name { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.space-sub { font-size: 12px; color: var(--label-2); }
+.space-check { flex: none; color: var(--accent); }
+.space-new {
+  display: flex; align-items: center; gap: 8px; width: 100%; margin-top: 8px; padding: 10px 8px; border-radius: 12px;
+  border-top: 0.5px solid var(--separator); border-radius: 0 0 12px 12px;
+  font-size: 14px; font-weight: 500; color: var(--accent); transition: background 0.15s, opacity 0.2s;
+}
+.space-new:not(:disabled):hover { background: var(--fill); border-radius: 12px; }
+.space-new:disabled { color: var(--label-3); cursor: default; }
+.space-hint { font-size: 12px !important; color: var(--label-3) !important; margin: 2px 8px 0 !important; }
+@media (max-width: 759px) { .spaces-pop { width: min(300px, calc(100vw - 32px)); } }

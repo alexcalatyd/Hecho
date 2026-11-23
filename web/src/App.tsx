@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { User, Users, ChevronLeft } from 'lucide-react'
 import { useSpace, childrenOf, type SpaceId, type Space } from './lib/store'
-import { useMembers } from './lib/members'
+import { useMembers, useSharedSpaces } from './lib/members'
 import { Account } from './components/Account'
 import { Settings } from './components/Settings'
 import { Segmented, fade } from './components/ui'
@@ -60,26 +60,40 @@ export default function App({ userId, cloud }: { userId: string; cloud: Cloud | 
   const wide = useWide()
   const t = useT()
   const [spaceId, setSpaceId] = usePersisted<SpaceId>('hecho:space', 'personal')
-  const [selected, setSelected] = usePersisted<Record<SpaceId, string | null>>('hecho:selected', {
+  const [selected, setSelected] = usePersisted<Record<string, string | null>>('hecho:selected', {
     personal: null,
     shared: null,
   })
   const [screen, setScreen] = useState<'home' | 'list'>('home')
 
+  // compartida activa: puede haber varias (una con cada persona)
+  const [sharedPick, setSharedPick] = usePersisted<string | null>(`hecho:sharedSpace:${userId}`, null)
+  const shared = useSharedSpaces(cloud ? userId : null)
+  const valid = (id: string | null) => !!id && (!shared.loaded || shared.spaces.some((s) => s.id === id))
+  const sharedId = !cloud
+    ? null
+    : valid(sharedPick)
+      ? sharedPick
+      : valid(cloud.shared)
+        ? cloud.shared
+        : ([...shared.spaces].sort((a, b) => b.members.length - a.members.length)[0]?.id ?? cloud.shared)
+
   const spaces = {
     personal: useSpace('personal', cloud?.personal ?? null, userId),
-    shared: useSpace('shared', cloud?.shared ?? null, userId),
+    shared: useSpace('shared', sharedId, userId),
   }
-  const team = useMembers(cloud?.shared ?? null)
+  const team = useMembers(sharedId)
+  const sharedNav = { ...shared, current: sharedId, pick: setSharedPick }
   const space = spaces[spaceId]
+  const selKey = spaceId === 'shared' && sharedId ? `shared:${sharedId}` : spaceId
 
   // si la lista seleccionada ya no existe, cae a la primera disponible
-  const sel = space.nodes.some((n) => n.id === selected[spaceId] && n.type === 'list')
-    ? selected[spaceId]
+  const sel = space.nodes.some((n) => n.id === selected[selKey] && n.type === 'list')
+    ? selected[selKey]
     : firstList(space)
 
   const select = (id: string) => {
-    setSelected((s) => ({ ...s, [spaceId]: id }))
+    setSelected((s) => ({ ...s, [selKey]: id }))
     setScreen('list')
   }
 
@@ -109,7 +123,7 @@ export default function App({ userId, cloud }: { userId: string; cloud: Cloud | 
 
   const tree = (
     <AnimatePresence mode="wait" initial={false}>
-      <motion.div key={spaceId} {...fade}>
+      <motion.div key={selKey} {...fade}>
         <Tree space={space} selectedId={wide ? sel : null} onSelect={select} selectOnCreate={wide} />
       </motion.div>
     </AnimatePresence>
@@ -117,12 +131,13 @@ export default function App({ userId, cloud }: { userId: string; cloud: Cloud | 
 
   const list = (
     <AnimatePresence mode="wait" initial={false}>
-      <motion.div key={`${spaceId}:${sel}`} {...fade} className="fill">
+      <motion.div key={`${selKey}:${sel}`} {...fade} className="fill">
         <ListView
           space={space}
           spaceId={spaceId}
           listId={sel}
           team={team}
+          shared={sharedNav}
           sharePopover={!!cloud}
           onCreateList={() => select(space.addNode('list', null, t('newList')).id)}
         />
@@ -131,7 +146,7 @@ export default function App({ userId, cloud }: { userId: string; cloud: Cloud | 
   )
 
   return (
-    <SelectionProvider space={space} currentListId={sel} resetKey={spaceId}>
+    <SelectionProvider space={space} currentListId={sel} resetKey={selKey}>
 
       {wide ? (
         <div className="shell">
@@ -163,7 +178,7 @@ export default function App({ userId, cloud }: { userId: string; cloud: Cloud | 
                 </div>
                 <div className="home-head">
                   <h1 className="title home-title">{t(spaceId)}</h1>
-                  {spaceId === 'shared' && cloud && <ShareButton team={team} me={space.me} />}
+                  {spaceId === 'shared' && cloud && <ShareButton team={team} me={space.me} shared={sharedNav} />}
                 </div>
                 <div className="card glass tree-card">{tree}</div>
               </motion.div>

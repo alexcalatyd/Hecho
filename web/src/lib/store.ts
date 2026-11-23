@@ -211,6 +211,16 @@ export function useSpace(space: SpaceId, cloudId: string | null, me: string) {
   const ref = useRef(data)
   const queue = useRef(Promise.resolve())
 
+  // al cambiar de compartida, arranca con la caché de la nueva (sin mezclar con la anterior)
+  const [loadedFor, setLoadedFor] = useState(cloudId)
+  if (loadedFor !== cloudId) {
+    const next = cloud ? read(CACHE_KEY(cloudId!), { nodes: [], todos: [] }) : loadLocal(space)
+    setLoadedFor(cloudId)
+    setData(next)
+    setReady(!cloud)
+    ref.current = next
+  }
+
   const apply = useCallback(
     (next: SpaceData) => {
       ref.current = next
