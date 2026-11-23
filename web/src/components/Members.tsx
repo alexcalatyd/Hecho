@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Copy, Check, ChevronRight, ChevronDown, Plus, UserPlus } from 'lucide-react'
+import { Copy, Check, ChevronRight, ChevronDown, LogOut, Plus, Trash2, UserPlus, X } from 'lucide-react'
 import { prettyCode, type useMembers, type useSharedSpaces } from '../lib/members'
 import { supabase } from '../lib/supabase'
 import { Avatar, ease } from './ui'
@@ -103,6 +103,7 @@ export function ShareButton({ team, me, shared }: { team: Team; me: string; shar
               shared={shared}
               me={me}
               onPick={(id) => (shared.pick(id), setOpen(null))}
+              onSwitch={shared.pick}
               onCreated={(id) => (shared.pick(id), setOpen('share'))}
             />
           </motion.div>
@@ -117,15 +118,30 @@ function SpacesList({
   shared,
   me,
   onPick,
+  onSwitch,
   onCreated,
 }: {
   shared: SharedNav
   me: string
   onPick: (id: string) => void
+  onSwitch: (id: string) => void
   onCreated: (id: string) => void
 }) {
   const t = useT()
   const [busy, setBusy] = useState(false)
+  const [confirm, setConfirm] = useState<string | null>(null)
+
+  const leave = async (id: string) => {
+    setBusy(true)
+    const ok = await shared.leave(id)
+    setBusy(false)
+    setConfirm(null)
+    // si era la que tenía abierta, pasa a otra
+    if (ok && id === shared.current) {
+      const next = shared.spaces.find((x) => x.id !== id)
+      if (next) onSwitch(next.id)
+    }
+  }
 
   const create = async () => {
     setBusy(true)
@@ -142,23 +158,46 @@ function SpacesList({
         {shared.spaces.map((s) => {
           const others = s.members.filter((m) => m.id !== me)
           const current = s.id === shared.current
+          const confirming = confirm === s.id
           return (
-            <button key={s.id} className="space-row" data-current={current} onClick={() => onPick(s.id)}>
-              <span className="avatars">
-                {others.length ? (
-                  others.slice(0, 3).map((m) => <Avatar key={m.id} m={m} />)
-                ) : (
-                  <span className="avatar add">
-                    <UserPlus size={13} strokeWidth={2.4} />
+            <div key={s.id} className="space-row" data-current={current} data-confirm={confirming}>
+              <button className="space-pick" onClick={() => onPick(s.id)}>
+                <span className="avatars">
+                  {others.length ? (
+                    others.slice(0, 3).map((m) => <Avatar key={m.id} m={m} />)
+                  ) : (
+                    <span className="avatar add">
+                      <UserPlus size={13} strokeWidth={2.4} />
+                    </span>
+                  )}
+                </span>
+                <span className="space-info">
+                  <span className="space-name">{others.length ? others.map((m) => m.name).join(', ') : t('notSharedYet')}</span>
+                  <span className="space-sub">{t(s.lists === 1 ? 'listsOne' : 'listsMany', { n: s.lists })}</span>
+                </span>
+                {current && !confirming && <Check size={16} strokeWidth={2.6} className="space-check" />}
+              </button>
+              {shared.spaces.length > 1 &&
+                (confirming ? (
+                  <span className="space-confirm">
+                    <button className="danger" disabled={busy} onClick={() => leave(s.id)}>
+                      {others.length ? t('leaveShared') : t('deleteShared')}
+                    </button>
+                    <button className="icon-btn" onClick={() => setConfirm(null)} aria-label={t('cancel')}>
+                      <X size={14} strokeWidth={2.4} />
+                    </button>
                   </span>
-                )}
-              </span>
-              <span className="space-info">
-                <span className="space-name">{others.length ? others.map((m) => m.name).join(', ') : t('notSharedYet')}</span>
-                <span className="space-sub">{t(s.lists === 1 ? 'listsOne' : 'listsMany', { n: s.lists })}</span>
-              </span>
-              {current && <Check size={16} strokeWidth={2.6} className="space-check" />}
-            </button>
+                ) : (
+                  <button
+                    className="icon-btn space-action"
+                    onClick={() => setConfirm(s.id)}
+                    aria-label={others.length ? t('leaveShared') : t('deleteShared')}
+                    title={others.length ? t('leaveShared') : t('deleteShared')}
+                  >
+                    {others.length ? <LogOut size={14} strokeWidth={2.2} /> : <Trash2 size={14} strokeWidth={2.2} />}
+                  </button>
+                ))}
+            </div>
           )
         })}
       </div>

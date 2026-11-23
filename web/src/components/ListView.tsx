@@ -39,9 +39,21 @@ export function ListView({
   )
   const done = useMemo(() => todos.filter((t) => t.done).sort((a, b) => (b.doneAt ?? 0) - (a.doneAt ?? 0)), [todos])
 
+  const shareEl =
+    isShared && (sharePopover ? <ShareButton team={team} me={space.me} shared={shared} /> : team.members.length > 1 && <Members team={team} />)
+
   if (!list) {
     return (
       <div className="list-view">
+        {/* sin listas también se puede compartir y cambiar de compartida */}
+        {isShared && (
+          <header className="header">
+            <div style={{ minWidth: 0 }}>
+              <h1 className="title">{t('shared')}</h1>
+            </div>
+            <div className="header-actions">{shareEl}</div>
+          </header>
+        )}
         <Empty
           icon={<ListPlus size={26} strokeWidth={1.8} />}
           title={t('noLists')}
@@ -91,7 +103,7 @@ export function ListView({
               {sel.mode ? t('done') : t('select')}
             </button>
           )}
-          {isShared && (sharePopover ? <ShareButton team={team} me={space.me} shared={shared} /> : team.members.length > 1 && <Members team={team} />)}
+          {shareEl}
         </div>
       </header>
 

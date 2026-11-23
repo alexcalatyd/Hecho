@@ -674,9 +674,20 @@ html.native .mobile { padding-top: 44px; }
 .spaces > p { padding: 0 4px; margin: 2px 0 10px !important; }
 .spaces-list { display: flex; flex-direction: column; gap: 2px; max-height: 320px; overflow-y: auto; }
 .space-row {
-  display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px; border-radius: 12px; text-align: left;
+  display: flex; align-items: center; gap: 4px; width: 100%; padding-right: 6px; border-radius: 12px;
   transition: background 0.15s;
 }
+.space-pick { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding: 8px; text-align: left; }
+.space-action { width: 26px; height: 26px; flex: none; color: var(--label-3); opacity: 0; transition: opacity 0.15s, color 0.15s; }
+.space-row:hover .space-action, .space-action:focus-visible { opacity: 1; }
+.space-action:hover { color: var(--danger, #ff3b30); }
+@media (hover: none) { .space-action { opacity: 1; } }
+.space-confirm { display: flex; align-items: center; gap: 2px; flex: none; }
+.space-confirm .danger {
+  height: 26px; padding: 0 10px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #fff; background: var(--danger, #ff3b30);
+}
+.space-confirm .danger:disabled { opacity: 0.5; }
+.space-confirm .icon-btn { width: 26px; height: 26px; }
 .space-row:hover { background: var(--fill); }
 .space-row[data-current='true'] { background: var(--accent-soft); }
 .space-row .avatars { flex: none; }

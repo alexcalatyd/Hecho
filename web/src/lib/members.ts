@@ -174,6 +174,14 @@ export function useSharedSpaces(userId: string | null) {
     loaded,
     canCreate,
     reload: load,
+    /** sale de una compartida (si se queda vacía, se elimina) */
+    leave: async (id: string): Promise<boolean> => {
+      if (!supabase) return false
+      const { error } = await supabase.rpc('leave_space', { s: id })
+      if (error) return console.error('[hecho] leave', error), false
+      await load()
+      return true
+    },
     /** crea una compartida nueva y devuelve su id (o null si no se puede) */
     create: async (): Promise<string | null> => {
       if (!supabase || !canCreate) return null
