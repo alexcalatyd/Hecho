@@ -652,3 +652,8 @@ html.native .mobile { padding-top: 44px; }
 .share-trigger:active { transform: scale(0.96); }
 .share-trigger:hover .avatar.add, .share-trigger[data-open='true'] .avatar.add { background: var(--fill-2); color: var(--label); }
 .share-panel.bare { padding: 0; margin: 0; border-radius: 0; background: none; }
+.home-head { position: relative; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 4px 16px; }
+.home-head .home-title { margin: 0; }
+/* en móvil el popover no cabe a lo ancho: se ajusta a la pantalla */
+@media (max-width: 759px) { .share-pop { width: min(300px, calc(100vw - 32px)); } }
+.header { position: relative; z-index: 20; }
