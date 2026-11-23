@@ -26,7 +26,16 @@ final class BundleSchemeHandler: NSObject, WKURLSchemeHandler {
 final class Bridge: NSObject, WKScriptMessageHandler {
     weak var window: NSWindow?
     func userContentController(_ c: WKUserContentController, didReceive m: WKScriptMessage) {
-        if m.body as? String == "drag", let w = window, let e = NSApp.currentEvent { w.performDrag(with: e) }
+        guard let body = m.body as? String else { return }
+        if body == "drag", let w = window, let e = NSApp.currentEvent { w.performDrag(with: e) }
+        // tema elegido en la web: el cristal nativo y la barra lo siguen
+        if body.hasPrefix("theme:") {
+            switch body.dropFirst(6) {
+            case "light": NSApp.appearance = NSAppearance(named: .aqua)
+            case "dark": NSApp.appearance = NSAppearance(named: .darkAqua)
+            default: NSApp.appearance = nil
+            }
+        }
     }
 }
 

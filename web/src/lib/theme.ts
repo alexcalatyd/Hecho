@@ -17,6 +17,7 @@ let theme: Theme = initial()
 
 function apply() {
   const root = document.documentElement
+  ;(window as any).webkit?.messageHandlers?.native?.postMessage(`theme:${theme}`)
   if (theme === 'system') root.removeAttribute('data-theme')
   else root.dataset.theme = theme
   // barra de estado / color del navegador acorde al tema elegido

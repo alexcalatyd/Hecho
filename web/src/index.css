@@ -130,7 +130,7 @@ html.native .sidebar { padding-top: 40px; }
   position: relative; z-index: 1; height: 100%;
   display: flex; flex-direction: column;
   max-width: 620px; margin: 0 auto;
-  padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 16px);
+  padding: calc(env(safe-area-inset-top) + 36px) 16px calc(env(safe-area-inset-bottom) + 16px);
 }
 html.native .mobile { padding-top: 44px; }
 .home-title { margin: 0 4px 16px; }
