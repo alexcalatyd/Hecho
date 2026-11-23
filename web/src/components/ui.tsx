@@ -32,7 +32,7 @@ export function Segmented<T extends string>({
         <button key={o.value} role="tab" aria-selected={value === o.value} onClick={() => onChange(o.value)}>
           {value === o.value && <motion.span layoutId="seg-pill" className="pill" transition={spring} />}
           {o.icon}
-          {o.label}
+          <span className="seg-label">{o.label}</span>
           {!!o.badge && <span className="badge">{o.badge}</span>}
         </button>
       ))}
