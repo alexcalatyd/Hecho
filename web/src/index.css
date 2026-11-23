@@ -595,3 +595,35 @@ html.native .mobile { padding-top: 44px; }
 .lang-pill { position: absolute; inset: 0; z-index: -1; border-radius: 7px; background: var(--solid); box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 0 0 .5px rgba(0,0,0,.04); }
 .topbar-settings { position: absolute; left: 0; top: 50%; translate: 0 -50%; }
 .login-lang { margin-top: 28px; width: 180px; }
+
+/* ---------- Panel de compartir (siempre a la vista en Compartida) ---------- */
+.share-slot { flex: none; }
+.share-panel { border-radius: 22px; padding: 16px; margin-bottom: 12px; }
+.sidebar .share-slot { padding: 0 8px 8px; }
+.sidebar .share-panel { margin: 0; padding: 12px; border-radius: 16px; background: var(--fill); box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.share-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.share-head h4 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.share-head p { font-size: 13px; color: var(--label-2); margin-top: 2px; }
+.sidebar .share-head h4 { font-size: 13px; }
+.sidebar .share-head p { font-size: 12px; }
+.sidebar .share-panel .code-box { background: var(--solid); height: 44px; }
+.sidebar .share-panel .code-box span { font-size: 18px; }
+.share-panel .code-box .icon-btn:disabled { opacity: 0.3; }
+.share-panel .join { margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--separator); }
+.join-toggle { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 500; color: var(--label-2); }
+.join-toggle svg { transition: transform 0.2s var(--ease); }
+.join-toggle[aria-expanded='true'] svg { transform: rotate(90deg); }
+.share-panel form { padding-top: 10px; }
+.share-panel .row-form { display: flex; gap: 8px; }
+.share-panel input {
+  flex: 1; min-width: 0; height: 38px; padding: 0 12px; border-radius: 10px; border: 0; outline: none;
+  background: var(--fill); font-family: ui-monospace, 'SF Mono', Menlo, monospace; letter-spacing: 0.08em;
+  text-transform: uppercase; font-size: 14px;
+}
+.sidebar .share-panel input { background: var(--solid); }
+.share-panel input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+.share-panel .join-hint { font-size: 11px; color: var(--label-3); margin-top: 6px; }
+/* iOS hace zoom al enfocar campos de menos de 16px y descoloca toda la pantalla */
+@media (hover: none) and (pointer: coarse) {
+  input { font-size: 16px !important; }
+}

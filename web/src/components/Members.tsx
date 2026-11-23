@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { UserPlus, Copy, Check } from 'lucide-react'
+import { Copy, Check, ChevronRight } from 'lucide-react'
 import { prettyCode, type useMembers } from '../lib/members'
 import { supabase } from '../lib/supabase'
 import { Avatar, ease } from './ui'
@@ -22,26 +22,35 @@ async function copy(text: string) {
   }
 }
 
-export function Members({ team, me }: { team: Team; me: string }) {
-  const [open, setOpen] = useState(false)
+/** Avatares de quien comparte el espacio (solo lectura, para la cabecera de la lista) */
+export function Members({ team }: { team: Team }) {
+  return (
+    <div className="avatars">
+      {team.members.map((m) => (
+        <Avatar key={m.id} m={m} />
+      ))}
+    </div>
+  )
+}
+
+/** Panel de compartir: siempre visible en el espacio compartido, con el código listo para copiar */
+export function SharePanel({ team, me }: { team: Team; me: string }) {
+  const t = useT()
   const [copied, setCopied] = useState(false)
+  const [joining, setJoining] = useState(false)
   const [joinCode, setJoinCode] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const ref = useRef<HTMLDivElement>(null)
-  const t = useT()
+  const asked = useRef(false)
 
+  // si el espacio aún no tiene código, lo creamos al entrar: nada de pasos previos
   useEffect(() => {
-    if (!open) return
-    const close = (e: PointerEvent) => !ref.current?.contains(e.target as Node) && setOpen(false)
-    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
-    document.addEventListener('pointerdown', close)
-    document.addEventListener('keydown', esc)
-    return () => {
-      document.removeEventListener('pointerdown', close)
-      document.removeEventListener('keydown', esc)
-    }
-  }, [open])
+    if (!supabase || !team.ready || team.code || asked.current) return
+    asked.current = true
+    team.createCode()
+  }, [team.ready, team.code, team])
+
+  if (!supabase) return null
 
   const join = async () => {
     setBusy(true)
@@ -57,93 +66,76 @@ export function Members({ team, me }: { team: Team; me: string }) {
 
   const days = team.code ? Math.max(1, Math.ceil((Date.parse(team.code.expiresAt) - Date.now()) / 864e5)) : 0
   const alone = team.members.length <= 1
+  const others = team.members.filter((m) => m.id !== me)
 
   return (
-    <div className="pop-wrap" ref={ref}>
-      <div className="avatars">
-        {team.members.map((m) => (
-          <Avatar key={m.id} m={m} />
-        ))}
-        <button className="avatar add" onClick={() => (setOpen((o) => !o), setError(null))} aria-label={t('share')}>
-          <UserPlus size={13} strokeWidth={2.4} />
+    <section className="share-panel glass">
+      <div className="share-head">
+        <div>
+          <h4>{alone ? t('inviteSomeone') : t('sharedWith', { names: others.map((m) => m.name).join(', ') })}</h4>
+          <p>{t('shareText')}</p>
+        </div>
+        {!alone && <Members team={team} />}
+      </div>
+
+      <div className="code-box">
+        <span>{team.code ? prettyCode(team.code.code) : '····-····'}</span>
+        <button
+          className="icon-btn"
+          disabled={!team.code}
+          onClick={() =>
+            copy(prettyCode(team.code!.code)).then(() => (setCopied(true), setTimeout(() => setCopied(false), 1500)))
+          }
+          aria-label={t('copyCode')}
+        >
+          {copied ? <Check size={16} strokeWidth={2.4} /> : <Copy size={16} strokeWidth={2} />}
         </button>
       </div>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="popover solid share-pop"
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1, transition: { duration: 0.18, ease } }}
-            exit={{ opacity: 0, transition: { duration: 0.1 } }}
-            style={{ transformOrigin: 'top right' }}
-          >
-            <h4>{t('share')}</h4>
-            {!supabase ? (
-              <p>{t('shareSignIn')}</p>
-            ) : (
-              <>
-                <p>{t('shareText')}</p>
-                {team.code ? (
-                  <>
-                    <div className="code-box">
-                      <span>{prettyCode(team.code.code)}</span>
-                      <button
-                        className="icon-btn"
-                        onClick={() =>
-                          copy(prettyCode(team.code!.code)).then(() => (setCopied(true), setTimeout(() => setCopied(false), 1500)))
-                        }
-                        aria-label={t('copyCode')}
-                      >
-                        {copied ? <Check size={15} strokeWidth={2.4} /> : <Copy size={15} strokeWidth={2} />}
-                      </button>
-                    </div>
-                    <div className="code-meta">
-                      <span>{t(days === 1 ? 'codeMetaOne' : 'codeMetaMany', { n: days })}</span>
-                      <button onClick={team.createCode}>{t('newCode')}</button>
-                      <button onClick={team.cancelCode}>{t('revoke')}</button>
-                    </div>
-                  </>
-                ) : (
-                  <button className="btn wide" onClick={team.createCode}>
-                    {t('createCode')}
+      {team.code && (
+        <div className="code-meta">
+          <span>{t(days === 1 ? 'codeMetaOne' : 'codeMetaMany', { n: days })}</span>
+          <button onClick={team.createCode}>{t('newCode')}</button>
+        </div>
+      )}
+
+      {alone && (
+        <div className="join">
+          <button className="join-toggle" aria-expanded={joining} onClick={() => (setJoining((j) => !j), setError(null))}>
+            <ChevronRight size={14} strokeWidth={2.4} />
+            {t('invited')}
+          </button>
+          <AnimatePresence initial={false}>
+            {joining && (
+              <motion.form
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1, transition: { duration: 0.24, ease } }}
+                exit={{ height: 0, opacity: 0, transition: { duration: 0.16, ease } }}
+                style={{ overflow: 'hidden' }}
+                onSubmit={(e) => (e.preventDefault(), join())}
+              >
+                <div className="row-form">
+                  <input
+                    placeholder="XXXX-XXXX"
+                    value={joinCode}
+                    inputMode="text"
+                    autoCapitalize="characters"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    spellCheck={false}
+                    maxLength={12}
+                    onChange={(e) => (setJoinCode(e.target.value.toUpperCase().trim()), setError(null))}
+                  />
+                  <button className="btn" disabled={joinCode.replace(/[^A-Z0-9]/gi, '').length < 8 || busy}>
+                    {t('join')}
                   </button>
-                )}
-
-                <div className="members">
-                  {team.members.map((m) => (
-                    <div className="member" key={m.id}>
-                      <Avatar m={m} />
-                      <span>{m.id === me ? t('you', { name: m.name }) : m.name}</span>
-                      <span>{m.email}</span>
-                    </div>
-                  ))}
                 </div>
-
-                {alone && (
-                  <form className="join" onSubmit={(e) => (e.preventDefault(), join())}>
-                    <p className="join-title">{t('invited')}</p>
-                    <div className="row-form">
-                      <input
-                        placeholder="XXXX-XXXX"
-                        value={joinCode}
-                        autoCapitalize="characters"
-                        autoComplete="off"
-                        spellCheck={false}
-                        onChange={(e) => (setJoinCode(e.target.value.toUpperCase()), setError(null))}
-                      />
-                      <button className="btn" disabled={joinCode.replace(/[^A-Z0-9]/gi, '').length < 8 || busy}>
-                        {t('join')}
-                      </button>
-                    </div>
-                    <p className="join-hint">{t('joinHint')}</p>
-                  </form>
-                )}
-                {error && <p className="pop-msg err">{error}</p>}
-              </>
+                <p className="join-hint">{t('joinHint')}</p>
+              </motion.form>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          </AnimatePresence>
+        </div>
+      )}
+      {error && <p className="pop-msg err">{error}</p>}
+    </section>
   )
 }

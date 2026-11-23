@@ -9,6 +9,7 @@ import { Segmented, fade } from './components/ui'
 import { Tree } from './components/Sidebar'
 import { ListView } from './components/ListView'
 import { SelectionProvider } from './components/Selection'
+import { SharePanel } from './components/Members'
 import { useT } from './lib/i18n'
 
 function useWide() {
@@ -114,6 +115,16 @@ export default function App({ userId, cloud }: { userId: string; cloud: Cloud | 
     </AnimatePresence>
   )
 
+  const share = (
+    <AnimatePresence initial={false}>
+      {spaceId === 'shared' && cloud && (
+        <motion.div key="share" {...fade} className="share-slot">
+          <SharePanel team={team} me={space.me} />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+
   const list = (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div key={`${spaceId}:${sel}`} {...fade} className="fill">
@@ -136,6 +147,7 @@ export default function App({ userId, cloud }: { userId: string; cloud: Cloud | 
           <aside className="sidebar glass">
             <div className="sidebar-top">{segmented}</div>
             <div className="sidebar-scroll">{tree}</div>
+            {share}
             <div className="sidebar-foot">
               {cloud && <Account userId={userId} align="up" />}
               <Settings align="up" />
@@ -160,6 +172,7 @@ export default function App({ userId, cloud }: { userId: string; cloud: Cloud | 
                   )}
                 </div>
                 <h1 className="title home-title">{t(spaceId)}</h1>
+                {share}
                 <div className="card glass tree-card">{tree}</div>
               </motion.div>
             ) : (

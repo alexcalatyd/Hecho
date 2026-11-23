@@ -64,7 +64,9 @@ const es = {
   // compartir
   share: 'Compartir',
   shareSignIn: 'Disponible al iniciar sesión.',
-  shareText: 'Pásale este código a quien quieras. Lo escribe en su Hecho y compartiréis este espacio.',
+  shareText: 'Pásale este código. Lo pega aquí mismo, en su Compartida, y ya estáis juntos.',
+  inviteSomeone: 'Invita a alguien',
+  sharedWith: 'Compartes con {names}',
   copyCode: 'Copiar código',
   codeMetaOne: 'Un solo uso · caduca en {n} día',
   codeMetaMany: 'Un solo uso · caduca en {n} días',
@@ -170,7 +172,9 @@ const en: Record<Key, string> = {
 
   share: 'Share',
   shareSignIn: 'Available once you sign in.',
-  shareText: 'Give this code to anyone. They type it into their Hecho and you’ll share this space.',
+  shareText: 'Send them this code. They paste it right here, in their Shared tab, and you’re in.',
+  inviteSomeone: 'Invite someone',
+  sharedWith: 'Shared with {names}',
   copyCode: 'Copy code',
   codeMetaOne: 'Single use · expires in {n} day',
   codeMetaMany: 'Single use · expires in {n} days',

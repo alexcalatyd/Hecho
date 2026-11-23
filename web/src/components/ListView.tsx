@@ -85,7 +85,7 @@ export function ListView({
               {sel.mode ? t('done') : t('select')}
             </button>
           )}
-          {isShared && <Members team={team} me={space.me} />}
+          {isShared && team.members.length > 1 && <Members team={team} />}
         </div>
       </header>
 

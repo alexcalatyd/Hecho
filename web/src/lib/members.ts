@@ -19,6 +19,7 @@ export const LOCAL_ME: Member = { id: 'me', name: 'Tú', color: '#0A84FF' }
 export function useMembers(cloudId: string | null) {
   const [members, setMembers] = useState<Member[]>(supabase ? [] : [LOCAL_ME])
   const [code, setCode] = useState<InviteCode | null>(null)
+  const [ready, setReady] = useState(false)
 
   const load = useCallback(async () => {
     if (!supabase || !cloudId) return
@@ -32,6 +33,7 @@ export function useMembers(cloudId: string | null) {
         .maybeSingle(),
     ])
     setCode(i.data ? { code: i.data.code as string, expiresAt: i.data.expires_at as string } : null)
+    if (!i.error) setReady(true)
     const ids = (m.data ?? []).map((r) => r.user_id as string)
     if (!ids.length) return setMembers([])
     const p = await supabase.from('profiles').select('id, email, name, color').in('id', ids)
@@ -56,6 +58,8 @@ export function useMembers(cloudId: string | null) {
   return {
     members,
     code,
+    /** ya sabemos si hay código o no (para crearlo solo si falta) */
+    ready,
     /** genera (o renueva) el código de invitación */
     createCode: async () => {
       if (!supabase || !cloudId) return
