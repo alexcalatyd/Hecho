@@ -1,0 +1,11 @@
+{{ if eq .Data.lang "en" }}<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:420px;margin:0 auto;padding:32px 24px;color:#1c1c1e">
+  <h1 style="font-size:22px;margin:0 0 12px">Confirm your account</h1>
+  <p style="font-size:15px;line-height:1.5;color:#3c3c43">Tap the button to confirm your email and start using Hecho. If you use the Mac app, go back to it afterwards and sign in.</p>
+  <p style="margin:24px 0"><a href="{{ .ConfirmationURL }}" style="background:#0a84ff;color:#fff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:600;display:inline-block">Confirm account</a></p>
+  <p style="font-size:13px;color:#8e8e93">If you didn't ask for this, you can ignore this email.</p>
+</div>{{ else }}<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:420px;margin:0 auto;padding:32px 24px;color:#1c1c1e">
+  <h1 style="font-size:22px;margin:0 0 12px">Confirma tu cuenta</h1>
+  <p style="font-size:15px;line-height:1.5;color:#3c3c43">Pulsa el botón para confirmar tu correo y empezar a usar Hecho. Si usas la app del Mac, después vuelve a ella y entra.</p>
+  <p style="margin:24px 0"><a href="{{ .ConfirmationURL }}" style="background:#0a84ff;color:#fff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:600;display:inline-block">Confirmar cuenta</a></p>
+  <p style="font-size:13px;color:#8e8e93">Si no lo has pedido tú, ignora este correo.</p>
+</div>{{ end }}

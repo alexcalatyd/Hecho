@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { LogOut } from 'lucide-react'
-import { supabase } from '../lib/supabase'
+import { supabase, signOut } from '../lib/supabase'
 import { useProfile } from '../lib/members'
 import { Avatar, ease } from './ui'
 import { useT } from '../lib/i18n'
@@ -28,14 +28,6 @@ export function Account({ userId, align = 'down' }: { userId: string; align?: 'u
   }, [open])
 
   if (!supabase || !me) return null
-
-  const signOut = async () => {
-    // borra la caché de este usuario del dispositivo
-    Object.keys(localStorage)
-      .filter((k) => k.startsWith('hecho:cloud:') || k.startsWith('hecho:boot:'))
-      .forEach((k) => localStorage.removeItem(k))
-    await supabase!.auth.signOut()
-  }
 
   const save = () => {
     const v = name.trim()

@@ -1,0 +1,11 @@
+{{ if eq .Data.lang "en" }}<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:420px;margin:0 auto;padding:32px 24px;color:#1c1c1e">
+  <h1 style="font-size:22px;margin:0 0 12px">Reset your password</h1>
+  <p style="font-size:15px;line-height:1.5;color:#3c3c43">Tap the button to choose a new password. The link expires in an hour and works only once.</p>
+  <p style="margin:24px 0"><a href="{{ .ConfirmationURL }}" style="background:#0a84ff;color:#fff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:600;display:inline-block">Choose password</a></p>
+  <p style="font-size:13px;color:#8e8e93">If you didn't ask for this, you can ignore this email.</p>
+</div>{{ else }}<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:420px;margin:0 auto;padding:32px 24px;color:#1c1c1e">
+  <h1 style="font-size:22px;margin:0 0 12px">Cambia tu contraseña</h1>
+  <p style="font-size:15px;line-height:1.5;color:#3c3c43">Pulsa el botón para elegir una contraseña nueva. El enlace caduca en una hora y solo sirve una vez.</p>
+  <p style="margin:24px 0"><a href="{{ .ConfirmationURL }}" style="background:#0a84ff;color:#fff;text-decoration:none;padding:12px 20px;border-radius:12px;font-weight:600;display:inline-block">Elegir contraseña</a></p>
+  <p style="font-size:13px;color:#8e8e93">Si no lo has pedido tú, ignora este correo.</p>
+</div>{{ end }}

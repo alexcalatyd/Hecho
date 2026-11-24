@@ -2,17 +2,18 @@ import { StrictMode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App, { type Cloud } from './App.tsx'
-import { Login } from './components/Login.tsx'
-import { supabase, useSession } from './lib/supabase'
+import { Login, NewPassword } from './components/Login.tsx'
+import { supabase, useSession, useRecovery, isNative } from './lib/supabase'
 import { useT } from './lib/i18n'
 import './lib/theme'
 
 const native = (window as any).webkit?.messageHandlers?.native
-if (native) document.documentElement.classList.add('native')
+if (isNative) document.documentElement.classList.add('native')
 
 /** Decide qué mostrar: modo local, login o la app con los espacios del usuario */
 function Root() {
   const session = useSession()
+  const recovering = useRecovery()
   const uid = session?.user.id
   const [cloud, setCloud] = useState<Cloud | null>(() => {
     try {
@@ -42,6 +43,7 @@ function Root() {
   if (!supabase) return <App userId="me" cloud={null} />
   if (session === undefined) return null
   if (!session) return <Login />
+  if (recovering) return <NewPassword />
   if (!cloud)
     return error ? (
       <div className="login">
