@@ -57,8 +57,20 @@ everything. Hecho keeps only what you reach for:
 On an iPhone, tap **Share → Add to Home Screen** and it opens full screen,
 like an app.
 
-**On the Mac**, Hecho is built from source. You need the Xcode command line
-tools (`xcode-select --install`) and Node:
+**On the Mac**, with Homebrew:
+
+```sh
+brew tap alexcalatyd/tap
+brew trust alexcalatyd/tap   # Homebrew asks you to trust third-party taps once
+brew install --cask alexcalatyd/tap/hecho
+```
+
+It's the same app as the hosted version, with the same accounts. Apple Silicon,
+macOS 14 or later. It isn't notarized by Apple, so the first time macOS blocks it: open it from
+**System Settings → Privacy & Security → Open Anyway** (Homebrew reminds you how).
+
+Or build it from source. You need the Xcode command line tools
+(`xcode-select --install`) and Node:
 
 ```sh
 brew install node
